@@ -10101,6 +10101,38 @@ void mg_stop(struct mg_context *ctx)
 #endif /* _WIN32 && !__SYMBIAN32__ */
 }
 
+
+#if defined(_WIN32)
+#if !defined(__SYMBIAN32__)
+#ifdef _MSC_VER
+#include <Lm.h>
+void GetWindowsVersion(DWORD *major, DWORD *minor, DWORD *revision)
+{
+	LPBYTE pinfoRawData;
+	if (NERR_Success == NetWkstaGetInfo(NULL, 100, &pinfoRawData))
+	{
+		WKSTA_INFO_100 * pworkstationInfo = (WKSTA_INFO_100 *)pinfoRawData;
+		*major = pworkstationInfo->wki100_ver_major;
+		*minor = pworkstationInfo->wki100_ver_minor;
+		*revision = 0;
+		NetApiBufferFree(pinfoRawData);
+		return true;
+	}
+	return false;
+}
+#else
+void GetWindowsVersion(DWORD *major, DWORD *minor, DWORD *revision)
+{
+	dwVersion = GetVersion();
+	*major = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+	*minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+	*revision = ((dwVersion < 0x80000000) ? (DWORD)(HIWORD(dwVersion)) : 0);
+}
+#endif
+#endif
+#endif
+
+
 static void get_system_name(char **sysName)
 {
 #if defined(_WIN32)
@@ -10111,20 +10143,7 @@ static void get_system_name(char **sysName)
 	DWORD dwMinorVersion = 0;
 	DWORD dwBuild = 0;
 
-#ifdef _MSC_VER
-#pragma warning(push)
-// GetVersion was declared deprecated
-#pragma warning(disable : 4996)
-#endif
-	dwVersion = GetVersion();
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-	dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-	dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-	dwBuild = ((dwVersion < 0x80000000) ? (DWORD)(HIWORD(dwVersion)) : 0);
-	(void)dwBuild;
+	GetWindowsVersion(&dwMajorVersion, &dwMinorVersion, &dwMinorVersion);
 
 	sprintf(name,
 	        "Windows %u.%u",
