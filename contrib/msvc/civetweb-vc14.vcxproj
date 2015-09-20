@@ -35,7 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C6F9379B-2083-491B-8304-644AE849B4B6}</ProjectGuid>
+    <ProjectGuid>{99544933-CE88-40EE-9AA8-FA8F7EAA47A3}</ProjectGuid>
     <RootNamespace>civetwebvc14</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>civetweb</ProjectName>
